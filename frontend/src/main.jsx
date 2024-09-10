@@ -4,7 +4,7 @@ import App from "./App.jsx";
 import { BoardProvider } from "./context/boardContext.jsx";
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:8080";
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
