@@ -3,7 +3,7 @@ import Board from "./Components/Board/Board";
 
 function App() {
     return (
-        <div className="max-w-7xl mx-auto font-inter">
+        <div className="max-w-7xl mx-auto font-roboto">
             <Navbar />
             <Board />
         </div>

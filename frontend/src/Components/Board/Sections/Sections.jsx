@@ -7,6 +7,7 @@ const Sections = ({
     handleOpenTaskModal,
     isSectionsLoading,
     isTasksLoading,
+    setSelectedTask,
 }) => {
     const { sections } = useBoardContext();
     return (
@@ -22,6 +23,7 @@ const Sections = ({
                             taskIds={section.taskIds}
                             handleOpenTaskModal={handleOpenTaskModal}
                             isTasksLoading={isTasksLoading}
+                            setSelectedTask={setSelectedTask}
                         />
                     );
                 })}

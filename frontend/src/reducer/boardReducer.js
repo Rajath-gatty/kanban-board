@@ -106,6 +106,24 @@ export const boardReducer = (state, action) => {
             ...state,
             sections: newSections,
         };
+    } else if (action.type === "DELETE_SECTION") {
+        const taskIds = state.sections[action.payload].taskIds;
+        const updatedSections = Object.fromEntries(
+            Object.entries(state.sections).filter(
+                ([_, val]) => val.id !== action.payload
+            )
+        );
+        const updatedTasks = Object.fromEntries(
+            Object.entries(state.tasks).filter(
+                ([_, val]) => !taskIds.includes(val.id)
+            )
+        );
+
+        return {
+            ...state,
+            sections: updatedSections,
+            tasks: updatedTasks,
+        };
     } else if (action.type === "SET_TASKS") {
         return {
             ...state,
@@ -117,5 +135,19 @@ export const boardReducer = (state, action) => {
             sections: action.payload,
         };
         return sections;
+    } else if (action.type === "UPDATE_TASK") {
+        const updatedTask = { ...state.tasks };
+        updatedTask[action.payload.id] = action.payload;
+        return {
+            ...state,
+            tasks: updatedTask,
+        };
+    } else if (action.type === "UPDATE_SECTION") {
+        const updatedSection = { ...state.sections };
+        updatedSection[action.payload.id] = action.payload;
+        return {
+            ...state,
+            sections: updatedSection,
+        };
     }
 };

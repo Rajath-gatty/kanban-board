@@ -3,7 +3,7 @@ export default {
     content: ["./src/**/*.{html,js,jsx}"],
     theme: {
         fontFamily: {
-            inter: ["Inter", "sans-serif"],
+            roboto: ["Roboto", "sans-serif"],
         },
     },
     plugins: [],

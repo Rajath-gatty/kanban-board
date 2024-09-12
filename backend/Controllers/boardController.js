@@ -24,6 +24,12 @@ export const postTask = asyncHandler(async (req, res) => {
     res.json({ success: true, result });
 });
 
+export const updateTask = asyncHandler(async (req, res) => {
+    const { task } = req.body;
+    await Task.findByIdAndUpdate(task.id, { ...task });
+    res.json({ success: true });
+});
+
 export const deleteTask = asyncHandler(async (req, res) => {
     const { taskId, sectionId } = req.body;
     await Task.findByIdAndDelete(taskId);
@@ -73,4 +79,18 @@ export const postSection = asyncHandler(async (req, res) => {
     const result = new Section({ name, taskIds: [] });
     await result.save();
     res.json({ success: true, result });
+});
+
+export const renameSection = asyncHandler(async (req, res) => {
+    const { name, sectionId } = req.body;
+    await Section.findByIdAndUpdate(sectionId, { name });
+    res.json({ success: true });
+});
+
+export const deleteSection = asyncHandler(async (req, res) => {
+    const { sectionId } = req.body;
+    const section = await Section.findById(sectionId);
+    await Task.deleteMany({ _id: { $in: section.taskIds } });
+    await Section.findByIdAndDelete(sectionId);
+    res.json({ success: true });
 });

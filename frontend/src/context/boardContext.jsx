@@ -61,6 +61,8 @@ const users = [
 const initialState = {
     sections: null,
     tasks: null,
+    isTaskEditing: false,
+    isSectionEditing: true,
     users,
 };
 
@@ -111,6 +113,17 @@ export const BoardProvider = ({ children }) => {
     const setSections = useCallback((sections) => {
         dispatch({ type: "SET_SECTIONS", payload: sections });
     }, []);
+    // Action to toggle state between normal and editing state for Task
+    const updateTask = useCallback((task) => {
+        dispatch({ type: "UPDATE_TASK", payload: task });
+    }, []);
+    // Action to toggle state between normal and editing state for Section
+    const updateSection = useCallback((section) => {
+        dispatch({ type: "UPDATE_SECTION", payload: section });
+    }, []);
+    const deleteSection = useCallback((sectionId) => {
+        dispatch({ type: "DELETE_SECTION", payload: sectionId });
+    }, []);
 
     return (
         <BoardContext.Provider
@@ -123,13 +136,21 @@ export const BoardProvider = ({ children }) => {
                 addNewSection,
                 setTasks,
                 setSections,
+                updateTask,
+                updateSection,
+                deleteSection,
             }}
         >
             {children}
         </BoardContext.Provider>
     );
 };
-// Custom hook to access the board context easily in other components
+// Custom hook to subscribe to the specific parts of the board context easily in other components
 export const useBoardContext = () => {
     return useContext(BoardContext);
+};
+
+export const getTaskById = (id) => {
+    const { tasks } = useContext(BoardContext);
+    return tasks[id];
 };

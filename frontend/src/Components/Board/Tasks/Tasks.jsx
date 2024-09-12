@@ -13,6 +13,7 @@ const Tasks = ({
     handleOpenTaskModal,
     isTasksLoading,
     isDraggingOver,
+    setSelectedTask,
 }) => {
     const { tasks, deleteTask } = useBoardContext();
 
@@ -26,6 +27,11 @@ const Tasks = ({
             { body: { taskId: id, sectionId } },
             "POST"
         );
+    };
+
+    const handleTaskEdit = (taskId) => {
+        handleOpenTaskModal(sectionId);
+        setSelectedTask(taskId);
     };
 
     return (
@@ -52,13 +58,14 @@ const Tasks = ({
                                 <Task
                                     item={tasks[taskId]}
                                     handleTaskDelete={handleTaskDelete}
+                                    handleTaskEdit={handleTaskEdit}
                                 />
                             </div>
                         )}
                     </Draggable>
                 ))}
             {/* Show the 'Add Task' button if there are no tasks */}
-            {!isTasksLoading && !taskIds.length > 0 && (
+            {!isTasksLoading && !isDraggingOver && (
                 <Card>
                     <div
                         className="flex gap-2 w-full justify-center cursor-pointer"

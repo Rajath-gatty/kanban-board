@@ -1,22 +1,37 @@
 import React, { useState } from "react";
 import Modal from "../../UI/Modal";
 import Button from "../../UI/Button";
-import { useBoardContext } from "../../../context/boardContext";
+import { useBoardContext, getTaskById } from "../../../context/boardContext";
 import useFetch from "../../../hooks/useFetch";
-import Loader from "../../UI/Loader";
+import { format } from "date-fns";
 
-const TaskInput = ({ isOpen, handleCloseTaskModal, currentSection }) => {
-    const { addNewTask, users } = useBoardContext();
+const TaskInput = ({
+    isOpen,
+    handleCloseTaskModal,
+    currentSection,
+    selectedTask,
+}) => {
+    const { addNewTask, users, updateTask } = useBoardContext();
+    const taskToUpdate = getTaskById(selectedTask);
 
-    const [formState, setFormState] = useState({
-        title: "",
-        description: "",
-        user: users[0].id,
-        dueDate: "",
-        tag: "",
-    });
+    const initializeFormState = () => {
+        if (selectedTask) {
+            return taskToUpdate;
+        } else {
+            return {
+                title: "",
+                description: "",
+                user: users[0].id,
+                dueDate: format(new Date(), "yyyy-MM-dd"),
+                tag: "",
+            };
+        }
+    };
+
+    const [formState, setFormState] = useState(initializeFormState);
 
     const { loading, makeRequest } = useFetch();
+    const { loading: isUpdating, makeRequest: postUpdateTask } = useFetch();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -38,14 +53,29 @@ const TaskInput = ({ isOpen, handleCloseTaskModal, currentSection }) => {
         };
 
         try {
-            // Make the API request to save the task to the database
-            const response = await makeRequest("/task", { body: task }, "POST");
+            if (selectedTask) {
+                task.id = selectedTask;
+                task.user = taskToUpdate.user;
+                await postUpdateTask(
+                    "/update-task",
+                    { body: { task } },
+                    "POST"
+                );
+                updateTask(task);
+            } else {
+                // Make the API request to save the task to the database
+                const response = await makeRequest(
+                    "/task",
+                    { body: task },
+                    "POST"
+                );
 
-            // Check if the request was successful and the result contains the task data
-            addNewTask(
-                { ...response.result, id: response.result._id },
-                currentSection
-            );
+                // Check if the request was successful and the result contains the task data
+                addNewTask(
+                    { ...response.result, id: response.result._id },
+                    currentSection
+                );
+            }
 
             handleCloseTaskModal();
 
@@ -54,7 +84,7 @@ const TaskInput = ({ isOpen, handleCloseTaskModal, currentSection }) => {
                 title: "",
                 description: "",
                 user: users[0].id,
-                dueDate: "",
+                dueDate: format(new Date(), "yyyy-MM-dd"),
                 tag: "",
             });
         } catch (error) {
@@ -64,7 +94,9 @@ const TaskInput = ({ isOpen, handleCloseTaskModal, currentSection }) => {
 
     return (
         <Modal isOpen={isOpen} onClose={handleCloseTaskModal}>
-            <h2 className="text-2xl font-medium mx-4 my-4">New Task</h2>
+            <h2 className="text-2xl font-medium mx-4 my-4">
+                {selectedTask ? "Edit Task" : "New Task"}
+            </h2>
             <form className="px-8 pb-4 space-y-3" onSubmit={handleTaskSubmit}>
                 <div className="flex flex-col gap-1 w-full">
                     <label htmlFor="title">Name</label>
@@ -117,8 +149,12 @@ const TaskInput = ({ isOpen, handleCloseTaskModal, currentSection }) => {
                         name="dueDate"
                         required
                         // Restricting to only select future date
-                        min={new Date().toISOString().split("T")[0]}
-                        value={formState.dueDate}
+                        min={
+                            !selectedTask
+                                ? format(new Date(), "yyyy-MM-dd")
+                                : "2024-09-01"
+                        }
+                        value={format(formState.dueDate, "yyyy-MM-dd")}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -135,20 +171,26 @@ const TaskInput = ({ isOpen, handleCloseTaskModal, currentSection }) => {
                     />
                 </div>
                 <div className="flex gap-4">
-                    <Button onClick={handleCloseTaskModal}>Cancel</Button>
                     <Button
-                        type="submit"
-                        className="bg-gray-900 text-white flex gap-4"
+                        type="button" // Ensure this button doesn't interfere with form submission
+                        className="w-[90px]"
+                        onClick={handleCloseTaskModal}
                     >
-                        {loading && (
-                            <Loader
-                                width={20}
-                                height={20}
-                                thickness={1}
-                                color="#e5e7eb"
-                            />
+                        Cancel
+                    </Button>
+                    <Button
+                        type="submit" // This button must be of type "submit" to trigger the form submission on Enter key
+                        className="bg-gray-900 text-white flex gap-4 w-[90px]"
+                    >
+                        {loading || isUpdating ? (
+                            <span className="w-full">
+                                {selectedTask ? "Saving..." : "Add..."}
+                            </span>
+                        ) : (
+                            <span className="w-full">
+                                {selectedTask ? "Save" : "Add"}
+                            </span>
                         )}
-                        <span>Add</span>
                     </Button>
                 </div>
             </form>

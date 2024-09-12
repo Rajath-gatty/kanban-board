@@ -13,6 +13,7 @@ const Board = () => {
     const [taskModalOpen, setTaskModalOpen] = useState(false);
     const [sectionModalOpen, setSectionModalOpen] = useState(false);
     const [currentSection, setCurrentSection] = useState(null);
+    const [selectedTask, setSelectedTask] = useState(null);
 
     const { reorderTask, moveTask, setTasks, setSections } = useBoardContext();
 
@@ -99,6 +100,7 @@ const Board = () => {
     // Functions to handle Modal states
     const handleCloseTaskModal = useCallback(() => {
         setCurrentSection(null);
+        setSelectedTask(null);
         setTaskModalOpen(false);
     }, []);
 
@@ -119,9 +121,10 @@ const Board = () => {
         <div className="flex gap-3 w-full overflow-x-auto">
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Sections
-                    handleOpenTaskModal={handleOpenTaskModal}
                     isSectionsLoading={sectionsLoading}
                     isTasksLoading={tasksLoading}
+                    handleOpenTaskModal={handleOpenTaskModal}
+                    setSelectedTask={setSelectedTask}
                 />
             </DragDropContext>
             {!sectionsLoading && (
@@ -138,16 +141,21 @@ const Board = () => {
                 </Card>
             )}
             {/* Modal to add new task */}
-            <TaskInput
-                isOpen={taskModalOpen}
-                handleCloseTaskModal={handleCloseTaskModal}
-                currentSection={currentSection}
-            />
+            {taskModalOpen && (
+                <TaskInput
+                    isOpen={taskModalOpen}
+                    currentSection={currentSection}
+                    selectedTask={selectedTask}
+                    handleCloseTaskModal={handleCloseTaskModal}
+                />
+            )}
             {/* Modal to add new section */}
-            <SectionInput
-                isOpen={sectionModalOpen}
-                handleCloseSectionModal={handleCloseSectionModal}
-            />
+            {sectionModalOpen && (
+                <SectionInput
+                    isOpen={sectionModalOpen}
+                    handleCloseSectionModal={handleCloseSectionModal}
+                />
+            )}
             {/* Error handing popover */}
             {(reorderError || moveTaskError) && (
                 <ErrorPopover message="Task updation Failed" />
