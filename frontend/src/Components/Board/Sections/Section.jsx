@@ -19,6 +19,7 @@ const Section = ({
     const { deleteSection } = useBoardContext();
     const [title, setTitle] = useState(initialTitle);
     const [newTitle, setNewTitle] = useState(initialTitle);
+    const [popoverOpen, setPopoverOpen] = useState(false);
 
     const { makeRequest: postUpdateSectionTitle } = useFetch();
     const { loading: deleteSectionLoading, makeRequest: postDeleteSection } =
@@ -41,6 +42,7 @@ const Section = ({
         );
         if (result.success) {
             setTitle(newTitle);
+            setPopoverOpen(false);
         } else {
             setTitle(initialTitle);
         }
@@ -73,6 +75,8 @@ const Section = ({
                                 size={25}
                             />
                         }
+                        isOpen={popoverOpen}
+                        setIsOpen={setPopoverOpen}
                     >
                         <div>
                             <h4 className="font-medium text-md mb-3">Rename</h4>

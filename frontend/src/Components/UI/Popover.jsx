@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 
-const Popover = ({ buttonLabel, children }) => {
-    const [isOpen, setIsOpen] = useState(false);
+const Popover = ({ buttonLabel, children, isOpen, setIsOpen }) => {
     const popoverRef = useRef(null);
 
     const togglePopover = () => {

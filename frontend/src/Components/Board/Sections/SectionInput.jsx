@@ -44,11 +44,18 @@ const SectionInput = ({ isOpen, handleCloseSectionModal }) => {
                         required
                     />
                 </div>
-                <div className="space-x-2 inline-block">
-                    <Button type="button" onClick={handleCloseSectionModal}>
+                <div className="flex gap-4">
+                    <Button
+                        type="button"
+                        className="w-[90px]"
+                        onClick={handleCloseSectionModal}
+                    >
                         Cancel
                     </Button>
-                    <Button type="submit" className="bg-gray-900 text-white">
+                    <Button
+                        type="submit"
+                        className="bg-gray-900 text-white w-[90px]"
+                    >
                         Add
                     </Button>
                 </div>
